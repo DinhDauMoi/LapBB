@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biên Bản Hư Hỏng - FPT Long Châu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- MAIN APP -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1>📋 Biên Bản Hư Hỏng</h1>
+                <span class="subtitle">FPT Long Châu - Lập biên bản hàng hóa hư hỏng</span>
+            </div>
+            <div class="header-right">
+                <div class="row-counter">
+                    <span class="counter-label">Dòng còn lại:</span>
+                    <span id="rowsRemaining" class="counter-value">15</span>
+                    <span class="counter-total">/ 15</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Top Controls -->
+        <div class="controls-bar">
+            <div class="control-group">
+                <label>Mã vận đơn (FRK...)</label>
+                <input type="text" id="maVanDon" placeholder="Nhập mã vận đơn..." class="input-field">
+            </div>
+            <div class="control-group">
+                <label>Vị trí lập biên bản</label>
+                <input type="text" id="viTriLap" placeholder="Nhập vị trí lập BB..." class="input-field">
+            </div>
+            <div class="control-group">
+                <label>Thời gian</label>
+                <input type="text" id="thoiGian" readonly class="input-field input-readonly">
+            </div>
+        </div>
+
+        <!-- Data Entry Form -->
+        <div class="entry-section">
+            <h2 class="section-title">Thêm sản phẩm</h2>
+            <div class="entry-form">
+                <div class="form-row">
+                    <div class="form-group fg-masp">
+                        <label>Mã SP <span class="required">*</span></label>
+                        <div class="autocomplete-wrap">
+                            <input type="text" id="maSP" placeholder="Nhập mã SP..." class="input-field" autocomplete="off">
+                            <div id="autocompleteList" class="autocomplete-list"></div>
+                        </div>
+                    </div>
+                    <div class="form-group fg-tensp">
+                        <label>Tên SP</label>
+                        <input type="text" id="tenSP" placeholder="Tự động / nhập tay" class="input-field">
+                    </div>
+                    <div class="form-group fg-sl">
+                        <label>SL</label>
+                        <input type="number" id="soLuong" placeholder="0" class="input-field" min="1">
+                    </div>
+                    <div class="form-group fg-dvt">
+                        <label>ĐVT</label>
+                        <input type="text" id="donViTinh" placeholder="Hộp, Vỉ..." class="input-field">
+                    </div>
+                    <div class="form-group fg-tt">
+                        <label>Tình trạng</label>
+                        <input type="text" id="tinhTrang" placeholder="Hư hỏng, Bể vỡ..." class="input-field">
+                    </div>
+                    <div class="form-group fg-ct">
+                        <label>Số chứng từ</label>
+                        <input type="text" id="soChungTu" placeholder="Số CT..." class="input-field">
+                    </div>
+                    <div class="form-group fg-btn">
+                        <label>&nbsp;</label>
+                        <button id="btnAdd" class="btn btn-add" onclick="addRow()">+ Thêm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-section">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th class="col-stt">STT</th>
+                        <th class="col-masp">Mã SP</th>
+                        <th class="col-tensp">Tên SP</th>
+                        <th class="col-sl">SL</th>
+                        <th class="col-dvt">ĐVT</th>
+                        <th class="col-tt">Tình trạng</th>
+                        <th class="col-ct">Số CT</th>
+                        <th class="col-action">Xóa</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state">
+                <span>📦</span>
+                <p>Chưa có sản phẩm nào. Hãy thêm sản phẩm ở trên.</p>
+            </div>
+        </div>
+
+        <!-- Bottom Actions -->
+        <div class="actions-bar">
+            <button class="btn btn-save" onclick="saveToSheet()">
+                <span class="btn-icon">💾</span> Lưu lên Google Sheet
+            </button>
+            <button class="btn btn-del" onclick="resetForm()">
+                <span class="btn-icon">🔄</span> Làm mới trang
+            </button>
+            <div class="print-section">
+                <input type="text" id="printCode" placeholder="Nhập mã in (VD: L001)..." class="input-field input-print">
+                <button class="btn btn-print" onclick="exportPDF()">
+                    <span class="btn-icon">🖨️</span> Xuất PDF
+                </button>
+            </div>
+            <div class="lookup-section">
+                <input type="text" id="lookupCode" placeholder="Nhập mã BB để tìm (VD: L001)..." class="input-field input-print">
+                <button class="btn btn-lookup" onclick="lookupBB()">
+                    <span class="btn-icon">🔍</span> Tìm BB
+                </button>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div id="statusBar" class="status-bar hidden">
+            <span id="statusText"></span>
+        </div>
+    </div>
+
+    <!-- PDF Preview Modal -->
+    <div id="pdfModal" class="modal hidden">
+        <div class="modal-overlay" onclick="closePDFModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Xem trước Biên Bản</h3>
+                <button class="btn-close" onclick="closePDFModal()">✕</button>
+            </div>
+            <div id="pdfPreview" class="pdf-preview"></div>
+            <div class="modal-footer">
+                <button class="btn btn-save" onclick="printPDF()">🖨️ In biên bản</button>
+                <button class="btn btn-lookup" onclick="closePDFModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
