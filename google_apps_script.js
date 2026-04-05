@@ -22,9 +22,12 @@ function doGet(e) {
     return getNextCode();
   }
   
+  if (action === 'getProducts') {
+    return getProducts();
+  }
+  
   if (action === 'lookup') {
-    var code = e.parameter.code;
-    return lookupBB(code);
+    return lookupBB(e.parameter.code);
   }
   
   return ContentService.createTextOutput(JSON.stringify({status: 'error', message: 'Unknown action'}))
@@ -45,6 +48,35 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({status: 'error', message: err.message}))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function getProducts() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName("DanhSachSP");
+  
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify({status: 'error', message: 'Không tìm thấy Sheet mang tên DanhSachSP'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  var data = sheet.getDataRange().getValues();
+  var products = [];
+  
+  for (var i = 0; i < data.length; i++) {
+    var maSP = String(data[i][0]).trim();
+    var tenSP = String(data[i][1]).trim();
+    
+    // Bỏ qua dòng Header nếu có chữ 'Mã SP' 
+    if (maSP && tenSP && maSP.toUpperCase() !== 'MÃ SP') {
+      products.push({
+        masp: maSP,
+        tensp: tenSP
+      });
+    }
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify({status: 'ok', data: products}))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function getNextCode() {

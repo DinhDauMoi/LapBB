@@ -1,6 +1,6 @@
 // ============ CONFIG ============
 const MAX_ROWS = 15;
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6jX6-ShzmHX8bnjy1JsqZ-37NShSHNhQ9qYPtqleS6bvnUwnU_Y2gQ7Bjjj4lwxFlmg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxkmT9jXOZ1-jOhaLbCSgmmgnEpFcyKF0TkhZIz177zv1hahnrDGJYabVgQ0pd-F14Kg/exec';
 
 let productData = [];
 let tableData = [];
@@ -25,12 +25,26 @@ function updateTime() {
 }
 
 async function loadProductData() {
+    if (!APPS_SCRIPT_URL) {
+        console.warn('Chưa cấu hình APPS_SCRIPT_URL. Autocomplete sẽ bị tắt.');
+        return;
+    }
+    
     try {
-        const res = await fetch('data.json');
-        productData = await res.json();
-        showStatus('Đã tải ' + productData.length + ' sản phẩm', 'info');
-    } catch(e) {
-        showStatus('Lỗi tải data.json: ' + e.message, 'error');
+        showStatus('Đang nạp từ điển hàng hóa...', 'info');
+        const res = await fetch(APPS_SCRIPT_URL + '?action=getProducts');
+        const json = await res.json();
+        if (json.status === 'ok' && json.data) {
+            productData = json.data;
+            console.log(`Loaded ${productData.length} products from Google Sheet`);
+            showStatus(`Sẵn sàng! Đã tải ${productData.length} sản phẩm`, 'success');
+        } else {
+            console.warn('Lỗi trả về từ Sheet: ', json.message);
+            productData = [];
+        }
+    } catch (e) {
+        console.warn('Không thể tải DanhSachSP từ Apps Script. Autocomplete bị tắt.', e);
+        productData = [];
     }
 }
 
