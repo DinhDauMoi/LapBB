@@ -1,1 +1,7 @@
-data.json  
+data.json
+.agents/
+.codeatlas/
+.cursor/
+.windsurfrules
+CLAUDE.md
+

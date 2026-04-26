@@ -1,6 +1,6 @@
 // ============ CONFIG ============
 const MAX_ROWS = 15;
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxARdTYhXhWynufRM922lw9st_ztGxSzI0l9r476uuE8T9G0xZCmYTcQvRpgwqWDxr_/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrsrxC6ct6b66rb8eMOVNgD_MDpzSfByc6jUX30f-42wlQTvGPuU_HORkXWk2SsZl7lQ/exec';
 
 let productData = [];
 let tableData = [];
