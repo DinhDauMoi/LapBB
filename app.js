@@ -1,6 +1,6 @@
 // ============ CONFIG ============
 const MAX_ROWS = 15;
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxkmT9jXOZ1-jOhaLbCSgmmgnEpFcyKF0TkhZIz177zv1hahnrDGJYabVgQ0pd-F14Kg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxARdTYhXhWynufRM922lw9st_ztGxSzI0l9r476uuE8T9G0xZCmYTcQvRpgwqWDxr_/exec';
 
 let productData = [];
 let tableData = [];
@@ -8,20 +8,167 @@ let currentBBCode = null;
 let lastSavedJSON = '';
 let isSaving = false;
 
+// ============ AUTH / LOGIN ============
+function checkSession() {
+    const session = sessionStorage.getItem('lbb_session');
+    if (session) {
+        try {
+            const user = JSON.parse(session);
+            if (user && user.username) {
+                showApp(user);
+                return true;
+            }
+        } catch (e) {
+            sessionStorage.removeItem('lbb_session');
+        }
+    }
+    showLogin();
+    return false;
+}
+
+function showLogin() {
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('mainApp').classList.add('hidden');
+    // Auto-focus username input
+    setTimeout(() => {
+        const userInput = document.getElementById('loginUser');
+        if (userInput) userInput.focus();
+    }, 400);
+}
+
+function showApp(user) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('loggedInUser').textContent = user.displayName || user.username;
+}
+
+async function handleLogin(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+    const errorEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
+    const btnText = document.getElementById('loginBtnText');
+    const spinner = document.getElementById('loginSpinner');
+
+    // Validate inputs
+    if (!username || !password) {
+        showLoginError('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
+        return;
+    }
+
+    // UI: loading state
+    btn.disabled = true;
+    btnText.textContent = 'Đang xác thực...';
+    spinner.classList.remove('hidden');
+    errorEl.classList.add('hidden');
+
+    try {
+        const res = await fetch(APPS_SCRIPT_URL + '?action=login&user=' + encodeURIComponent(username) + '&pass=' + encodeURIComponent(password));
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+            // Save session
+            const sessionData = {
+                username: data.username || username,
+                displayName: data.displayName || username,
+                role: data.role || 'user',
+                loginTime: new Date().toISOString()
+            };
+            sessionStorage.setItem('lbb_session', JSON.stringify(sessionData));
+
+            // Show success briefly then transition
+            btnText.textContent = '✅ Đăng nhập thành công!';
+            spinner.classList.add('hidden');
+            
+            setTimeout(() => {
+                showApp(sessionData);
+                initApp();
+                // Reset login form
+                document.getElementById('loginForm').reset();
+                btn.disabled = false;
+                btnText.textContent = 'Đăng nhập';
+            }, 600);
+            return;
+        } else {
+            showLoginError(data.message || 'Sai tên đăng nhập hoặc mật khẩu.');
+        }
+    } catch (e) {
+        showLoginError('Không thể kết nối đến máy chủ. Vui lòng thử lại.');
+        console.error('Login error:', e);
+    }
+
+    btn.disabled = false;
+    btnText.textContent = 'Đăng nhập';
+    spinner.classList.add('hidden');
+}
+
+function showLoginError(msg) {
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = msg;
+    errorEl.classList.remove('hidden');
+    // Re-trigger shake animation
+    errorEl.style.animation = 'none';
+    errorEl.offsetHeight; // Force reflow
+    errorEl.style.animation = '';
+}
+
+function togglePasswordVisibility() {
+    const passInput = document.getElementById('loginPass');
+    const eyeIcon = document.getElementById('eyeIcon');
+    if (passInput.type === 'password') {
+        passInput.type = 'text';
+        eyeIcon.textContent = '🙈';
+    } else {
+        passInput.type = 'password';
+        eyeIcon.textContent = '👁️';
+    }
+}
+
+function handleLogout() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+        sessionStorage.removeItem('lbb_session');
+        // Reset app state
+        tableData = [];
+        currentBBCode = null;
+        lastSavedJSON = '';
+        productData = [];
+        showLogin();
+    }
+}
+
 // ============ INIT ============
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+    if (checkSession()) {
+        initApp();
+    }
+    
+    // Enter key on login form
+    document.getElementById('loginPass').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+        }
+    });
+});
+
+async function initApp() {
     updateTime();
     setInterval(updateTime, 1000);
     await loadProductData();
     setupAutocomplete();
     updateRowCounter();
-});
+}
 
 function updateTime() {
     const now = new Date();
     const pad = n => String(n).padStart(2, '0');
-    document.getElementById('thoiGian').value =
-        `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const thoiGianEl = document.getElementById('thoiGian');
+    if (thoiGianEl) {
+        thoiGianEl.value =
+            `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    }
 }
 
 async function loadProductData() {
@@ -345,9 +492,9 @@ function generatePDFPreview(bbCode) {
             <div style="text-align: center; font-size: 16px;">
                 <div class="textr" style="padding-top: 10px;">Hôm nay, .............. tháng .............. năm .............. tại Kho Tổng Long Châu.</div>
                 <div class="textr" style="padding-top: 10px;">Bên giao hàng ..............................................................................................</div>
-                <div class="textr" style="padding-top: 10px;"> - Ông (bà) ...................................................................................................</div>
+                <div class="textr" style="padding-top: 10px;"> - Ông (bà) .....................................................................................................</div>
                 <div class="textr" style="padding-top: 10px;">Bên giao hàng ..............................................................................................</div>
-                <div class="textr" style="padding-top: 10px;"> - Ông (bà) ...................................................................................................</div>
+                <div class="textr" style="padding-top: 10px;"> - Ông (bà) .....................................................................................................</div>
                 <div class="textr" style="padding-top: 10px; text-align: left;">Cùng nhau kiểm kê hàng hóa bị hư hỏng do vận chuyển như sau :</div>
                 <div class="textr" style="font-size: 13px;padding-top: 10px; text-align: left; font-weight: bold;">
                     MÃ VẬN ĐƠN: ${maVanDon || 'FRK.....................'} &nbsp;&nbsp;&nbsp; 
@@ -363,8 +510,8 @@ function generatePDFPreview(bbCode) {
         </div>
         <div class="textr" style="padding-top: 10px; font-size: 12px; text-align: left; font-style: italic; margin-top: 10px;">Biên bản này được lập thành 02 bản và có giá trị pháp lý như nhau, 01 bản lưu tại bên nhận, 01 bản đưa bên vận chuyển.</div>
         <div class="footer" style="margin-top: 40px; display: flex; justify-content: space-around; font-weight: bold; font-size: 14px;">
-            <div style="text-align: center;">BÊN NHẬN HÀNG<br><span style="font-weight: normal; font-size: 12px; font-style: italic;">(Ký ghi rõ họ tên)</span></div>
-            <div style="text-align: center;">BÊN GIAO HÀNG<br><span style="font-weight: normal; font-size: 12px; font-style: italic;">(Ký ghi rõ họ tên)</span></div>
+            <div style="text-align: center;">BÊN NHẬN HÀNG<br><span style="font-weight: normal; font-size: 12px; font-style: italic;">(Ký ghi rõ họ tên)</span></div>
+            <div style="text-align: center;">BÊN GIAO HÀNG<br><span style="font-weight: normal; font-size: 12px; font-style: italic;">(Ký ghi rõ họ tên)</span></div>
         </div>
     </div>`;
 

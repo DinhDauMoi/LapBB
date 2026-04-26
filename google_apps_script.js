@@ -18,6 +18,10 @@
 function doGet(e) {
   var action = e.parameter.action;
   
+  if (action === 'login') {
+    return handleLogin(e.parameter.user, e.parameter.pass);
+  }
+  
   if (action === 'getNextCode') {
     return getNextCode();
   }
@@ -32,6 +36,54 @@ function doGet(e) {
   
   return ContentService.createTextOutput(JSON.stringify({status: 'error', message: 'Unknown action'}))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ============ LOGIN ============
+// Sheet "Users" structure:
+// Column A: username
+// Column B: password
+// Column C: displayName (Tên hiển thị)
+// Column D: role (admin / user)
+function handleLogin(username, password) {
+  if (!username || !password) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error', 
+      message: 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.'
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName("Users");
+  
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error', 
+      message: 'Chưa tạo Sheet "Users". Vui lòng tạo sheet Users với các cột: username, password, displayName, role'
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  var data = sheet.getDataRange().getValues();
+  
+  for (var i = 1; i < data.length; i++) { // Skip header row
+    var uname = String(data[i][0]).trim();
+    var pass = String(data[i][1]).trim();
+    var displayName = String(data[i][2]).trim();
+    var role = String(data[i][3]).trim() || 'user';
+    
+    if (uname.toLowerCase() === username.toLowerCase() && pass === password) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'ok',
+        username: uname,
+        displayName: displayName || uname,
+        role: role
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify({
+    status: 'error', 
+    message: 'Sai tên đăng nhập hoặc mật khẩu.'
+  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
