@@ -578,28 +578,615 @@ body {
     .app-container { display: none; }
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .app-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .header-right { flex-direction: column; align-items: flex-start; width: 100%; }
-    .user-info { width: 100%; justify-content: space-between; margin-right: 0; }
-    .row-counter { width: 100%; justify-content: center; }
-    .controls-bar { grid-template-columns: 1fr; }
-    .form-row { flex-direction: column; align-items: stretch; gap: 12px; }
-    .form-group { flex: 1 !important; width: 100%; }
-    .table-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    #dataTable { min-width: 600px; }
-    
-    .actions-bar { flex-direction: column; align-items: stretch; gap: 16px; }
-    .actions-bar .btn { width: 100%; justify-content: center; }
-    .print-section, .lookup-section { flex-direction: column; width: 100%; gap: 8px; }
-    .input-print { width: 100%; }
-    
-    .modal-content { width: 95%; max-height: 95vh; }
-    .modal-footer { flex-direction: column; gap: 10px; }
-    .modal-footer .btn { width: 100%; justify-content: center; }
+/* ============ RESPONSIVE TRANSITIONS ============ */
+.app-header,
+.header-left,
+.header-right,
+.controls-bar,
+.form-row,
+.form-group,
+.actions-bar,
+.print-section,
+.lookup-section,
+.user-info,
+.row-counter,
+.modal-content,
+.login-card {
+    transition: all 0.3s ease;
+}
 
-    /* Login responsive */
-    .login-card { padding: 32px 24px; }
-    .login-title { font-size: 1.3rem; }
+/* ============ LARGE DESKTOP (1400px+) ============ */
+@media (min-width: 1400px) {
+    .app-container {
+        max-width: 1360px;
+    }
+    body {
+        padding: 28px 40px;
+    }
+}
+
+/* ============ TABLET LANDSCAPE (max 1024px) ============ */
+@media (max-width: 1024px) {
+    body {
+        padding: 16px;
+    }
+    .app-container {
+        gap: 12px;
+    }
+    .app-header {
+        padding: 16px 18px;
+    }
+    .app-header h1 {
+        font-size: 1.25rem;
+    }
+    .subtitle {
+        font-size: 0.78rem;
+    }
+    .header-right {
+        gap: 8px;
+    }
+    .user-info {
+        padding: 6px 10px;
+        gap: 8px;
+        margin-right: 8px;
+    }
+    .user-name {
+        font-size: 0.8rem;
+    }
+    .row-counter {
+        padding: 8px 14px;
+    }
+    .counter-value {
+        font-size: 1.2rem;
+    }
+    .controls-bar {
+        padding: 14px 16px;
+        gap: 10px;
+    }
+    .entry-section {
+        padding: 14px 16px;
+    }
+    /* Form row: wrap into 2 rows on tablet */
+    .form-row {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .fg-masp { flex: 1 1 18%; min-width: 120px; }
+    .fg-tensp { flex: 1 1 35%; min-width: 180px; }
+    .fg-sl { flex: 0 1 70px; }
+    .fg-dvt { flex: 0 1 90px; }
+    .fg-tt { flex: 1 1 20%; min-width: 130px; }
+    .fg-ct { flex: 0 1 120px; }
+    .fg-btn { flex: 0 1 100px; }
+    .actions-bar {
+        padding: 14px 16px;
+        gap: 10px;
+    }
+    .input-print {
+        width: 150px;
+    }
+    .modal-content {
+        width: 92%;
+    }
+}
+
+/* ============ TABLET PORTRAIT (max 768px) ============ */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+    .app-container {
+        gap: 10px;
+    }
+
+    /* --- Header --- */
+    .app-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 14px 16px;
+    }
+    .header-left {
+        text-align: center;
+    }
+    .app-header h1 {
+        font-size: 1.15rem;
+    }
+    .subtitle {
+        font-size: 0.75rem;
+    }
+    .header-right {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: 8px;
+    }
+    .user-info {
+        flex: 1 1 auto;
+        justify-content: center;
+        margin-right: 0;
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+    .row-counter {
+        flex: 0 0 auto;
+        padding: 8px 16px;
+        border-radius: 8px;
+    }
+
+    /* --- Controls Bar --- */
+    .controls-bar {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .controls-bar .control-group:last-child {
+        grid-column: 1 / -1;
+    }
+
+    /* --- Form Entry --- */
+    .entry-section {
+        padding: 12px 14px;
+    }
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .form-group {
+        flex: 1 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    .form-group label {
+        font-size: 0.72rem;
+    }
+    .input-field {
+        padding: 12px 14px;
+        font-size: 0.88rem;
+    }
+    .btn-add {
+        width: 100%;
+        padding: 12px;
+        font-size: 0.9rem;
+        justify-content: center;
+    }
+
+    /* --- Table: Horizontal scroll --- */
+    .table-section {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: var(--radius);
+    }
+    .table-section::after {
+        content: '← vuốt ngang để xem thêm →';
+        display: block;
+        text-align: center;
+        padding: 8px;
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        background: var(--surface2);
+        border-top: 1px solid var(--border);
+    }
+    #dataTable {
+        min-width: 650px;
+    }
+    #dataTable th {
+        padding: 8px 10px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+    }
+    #dataTable td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+
+    /* --- Actions Bar --- */
+    .actions-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .actions-bar > .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 18px;
+    }
+    .print-section,
+    .lookup-section {
+        flex-direction: row;
+        width: 100%;
+        gap: 8px;
+    }
+    .print-section .input-field,
+    .lookup-section .input-field {
+        flex: 1;
+        min-width: 0;
+    }
+    .input-print {
+        width: auto;
+        flex: 1;
+    }
+    .print-section .btn,
+    .lookup-section .btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    /* --- Modal --- */
+    .modal-content {
+        width: 95%;
+        max-height: 92vh;
+    }
+    .modal-header {
+        padding: 12px 16px;
+    }
+    .modal-header h3 {
+        font-size: 1rem;
+    }
+    .modal-footer {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 16px;
+    }
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* --- Login responsive --- */
+    .login-card {
+        padding: 32px 24px;
+    }
+    .login-title {
+        font-size: 1.3rem;
+    }
+}
+
+/* ============ MOBILE (max 480px) ============ */
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+    .app-container {
+        gap: 8px;
+    }
+
+    /* --- Header compact --- */
+    .app-header {
+        padding: 12px;
+        gap: 10px;
+        border-radius: 8px;
+    }
+    .app-header h1 {
+        font-size: 1.05rem;
+    }
+    .subtitle {
+        font-size: 0.7rem;
+        margin-top: 2px;
+    }
+    .header-right {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .user-info {
+        width: 100%;
+        padding: 6px 10px;
+        font-size: 0.78rem;
+        gap: 6px;
+    }
+    .user-badge {
+        font-size: 0.95rem;
+    }
+    .user-name {
+        font-size: 0.75rem;
+    }
+    .btn-logout {
+        padding: 4px 10px !important;
+        font-size: 0.7rem !important;
+    }
+    .row-counter {
+        width: 100%;
+        justify-content: center;
+        padding: 6px 12px;
+    }
+    .counter-label {
+        font-size: 0.78rem;
+    }
+    .counter-value {
+        font-size: 1.1rem;
+    }
+    .counter-total {
+        font-size: 0.78rem;
+    }
+
+    /* --- Controls compact --- */
+    .controls-bar {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    .controls-bar .control-group:last-child {
+        grid-column: auto;
+    }
+    .control-group label {
+        font-size: 0.68rem;
+        margin-bottom: 4px;
+    }
+    .input-field {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+
+    /* --- Entry form compact --- */
+    .entry-section {
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    .section-title {
+        font-size: 0.88rem;
+        margin-bottom: 10px;
+    }
+    .form-row {
+        gap: 8px;
+    }
+    .form-group label {
+        font-size: 0.67rem;
+    }
+
+    /* --- Table: card-style on mobile --- */
+    .table-section {
+        overflow-x: hidden;
+        border-radius: 8px;
+    }
+    .table-section::after {
+        display: none;
+    }
+    #dataTable {
+        min-width: 0;
+        width: 100%;
+    }
+    #dataTable thead {
+        display: none;
+    }
+    #dataTable tbody tr {
+        display: flex;
+        flex-direction: column;
+        padding: 12px;
+        margin: 0;
+        border-bottom: 1px solid var(--border);
+        gap: 6px;
+        position: relative;
+    }
+    #dataTable tbody tr:last-child {
+        border-bottom: none;
+    }
+    #dataTable tbody tr:hover {
+        background: rgba(99, 102, 241, 0.06);
+    }
+    #dataTable td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 3px 0;
+        border-bottom: none;
+        font-size: 0.82rem;
+    }
+    #dataTable td::before {
+        content: attr(data-label);
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        flex-shrink: 0;
+        margin-right: 12px;
+    }
+    #dataTable td:last-child {
+        justify-content: flex-end;
+        padding-top: 6px;
+        border-top: 1px solid rgba(46, 51, 72, 0.3);
+        margin-top: 2px;
+    }
+
+    /* --- Actions bar compact --- */
+    .actions-bar {
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    .actions-bar > .btn {
+        padding: 11px 14px;
+        font-size: 0.82rem;
+    }
+    .print-section,
+    .lookup-section {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .print-section .btn,
+    .lookup-section .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* --- Status bar --- */
+    .status-bar {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    /* --- Modal full-screen on mobile --- */
+    .modal-content {
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 12px 12px 0 0;
+        margin-top: auto;
+    }
+    .pdf-preview {
+        padding: 12px;
+    }
+    .modal-footer {
+        padding: 10px 12px;
+    }
+
+    /* --- Login compact --- */
+    .login-card {
+        padding: 28px 20px;
+        border-radius: 16px;
+        max-width: 95vw;
+    }
+    .logo-icon {
+        font-size: 2.4rem;
+        margin-bottom: 8px;
+    }
+    .login-title {
+        font-size: 1.2rem;
+    }
+    .login-subtitle {
+        font-size: 0.72rem;
+    }
+    .login-input-group label {
+        font-size: 0.68rem;
+    }
+    .login-input {
+        padding: 11px 12px 11px 40px;
+        font-size: 0.88rem;
+    }
+    .btn-login {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    .login-footer {
+        margin-top: 18px;
+        padding-top: 16px;
+    }
+    .login-footer span {
+        font-size: 0.68rem;
+    }
+
+    /* Background shapes smaller on mobile */
+    .shape-1 { width: 280px; height: 280px; }
+    .shape-2 { width: 220px; height: 220px; }
+    .shape-3 { width: 160px; height: 160px; }
+}
+
+/* ============ SMALL MOBILE (max 360px) ============ */
+@media (max-width: 360px) {
+    body {
+        padding: 6px;
+    }
+    .app-header h1 {
+        font-size: 0.95rem;
+    }
+    .subtitle {
+        font-size: 0.65rem;
+    }
+    .user-info {
+        padding: 5px 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+    }
+    .btn-logout {
+        font-size: 0.65rem !important;
+        padding: 3px 8px !important;
+    }
+    .controls-bar {
+        padding: 8px 10px;
+    }
+    .input-field {
+        padding: 9px 10px;
+        font-size: 0.82rem;
+    }
+    .entry-section {
+        padding: 8px 10px;
+    }
+    .section-title {
+        font-size: 0.82rem;
+    }
+    .actions-bar {
+        padding: 8px 10px;
+    }
+    .actions-bar > .btn {
+        padding: 10px 12px;
+        font-size: 0.78rem;
+    }
+    .login-card {
+        padding: 24px 16px;
+    }
+    .login-title {
+        font-size: 1.05rem;
+    }
+    .login-form {
+        gap: 16px;
+    }
+    .btn-login {
+        padding: 11px;
+    }
+
+    .shape-1 { width: 200px; height: 200px; }
+    .shape-2 { width: 160px; height: 160px; }
+    .shape-3 { width: 120px; height: 120px; }
+}
+
+/* ============ TOUCH DEVICE OPTIMIZATIONS ============ */
+@media (hover: none) and (pointer: coarse) {
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    .btn-del {
+        min-height: 36px;
+        min-width: 36px;
+        padding: 6px 12px;
+    }
+    .input-field {
+        min-height: 44px;
+    }
+    .login-input {
+        min-height: 44px;
+    }
+    .autocomplete-item {
+        padding: 12px;
+        min-height: 44px;
+    }
+    .toggle-pass {
+        padding: 8px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* ============ LANDSCAPE MOBILE ============ */
+@media (max-height: 500px) and (orientation: landscape) {
+    .login-screen {
+        align-items: flex-start;
+        overflow-y: auto;
+        padding: 16px;
+    }
+    .login-card {
+        padding: 20px 24px;
+        margin: auto;
+    }
+    .login-logo {
+        margin-bottom: 16px;
+    }
+    .logo-icon {
+        font-size: 2rem;
+        margin-bottom: 6px;
+    }
+    .login-form {
+        gap: 12px;
+    }
+    .login-footer {
+        margin-top: 12px;
+        padding-top: 12px;
+    }
 }

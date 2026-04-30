@@ -296,14 +296,14 @@ function renderTable() {
     empty.classList.add('hidden');
     tbody.innerHTML = tableData.map((r, i) =>
         `<tr>
-            <td class="col-stt">${i + 1}</td>
-            <td>${r.maSP}</td>
-            <td>${r.tenSP}</td>
-            <td class="col-stt">${r.soLuong}</td>
-            <td>${r.donViTinh}</td>
-            <td>${r.tinhTrang}</td>
-            <td>${r.soChungTu}</td>
-            <td class="col-stt"><button class="btn btn-del" onclick="deleteRow(${i})">✕</button></td>
+            <td class="col-stt" data-label="STT">${i + 1}</td>
+            <td data-label="Mã SP">${r.maSP}</td>
+            <td data-label="Tên SP">${r.tenSP}</td>
+            <td class="col-stt" data-label="SL">${r.soLuong}</td>
+            <td data-label="ĐVT">${r.donViTinh}</td>
+            <td data-label="Tình trạng">${r.tinhTrang}</td>
+            <td data-label="Số CT">${r.soChungTu}</td>
+            <td class="col-stt" data-label="Xóa"><button class="btn btn-del" onclick="deleteRow(${i})">✕</button></td>
         </tr>`
     ).join('');
 }
