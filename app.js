@@ -251,10 +251,6 @@ function setupAutocomplete() {
 
 // ============ TABLE OPERATIONS ============
 function addRow() {
-    if (tableData.length >= MAX_ROWS) {
-        showStatus(`Đã đạt giới hạn ${MAX_ROWS} dòng trên 1 trang A4!`, 'error');
-        return;
-    }
     const maSP = document.getElementById('maSP').value.trim();
     const tenSP = document.getElementById('tenSP').value.trim();
     const soLuong = document.getElementById('soLuong').value.trim();
@@ -265,14 +261,21 @@ function addRow() {
     if (!maSP) { showStatus('Mã sản phẩm không được bỏ trống!', 'error'); document.getElementById('maSP').focus(); return; }
 
     // Check for duplicate product code
-    const isDuplicate = tableData.some(row => row.maSP.toLowerCase() === maSP.toLowerCase());
-    if (isDuplicate) {
-        showStatus(`Mã sản phẩm ${maSP} đã được thêm trước đó!`, 'error');
-        document.getElementById('maSP').focus();
-        return;
+    const existingRowIndex = tableData.findIndex(row => row.maSP.toLowerCase() === maSP.toLowerCase());
+    
+    if (existingRowIndex !== -1) {
+        const currentQty = parseInt(tableData[existingRowIndex].soLuong) || 0;
+        const addQty = parseInt(soLuong) || 0;
+        tableData[existingRowIndex].soLuong = currentQty + addQty;
+        showStatus(`Đã cộng dồn số lượng cho mã sản phẩm ${maSP}!`, 'success');
+    } else {
+        if (tableData.length >= MAX_ROWS) {
+            showStatus(`Đã đạt giới hạn ${MAX_ROWS} dòng trên 1 trang A4!`, 'error');
+            return;
+        }
+        tableData.push({ maSP, tenSP, soLuong, donViTinh, tinhTrang, soChungTu });
     }
 
-    tableData.push({ maSP, tenSP, soLuong, donViTinh, tinhTrang, soChungTu });
     renderTable();
     clearForm();
     updateRowCounter();
